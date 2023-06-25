@@ -1,27 +1,29 @@
 let g:findSourceEnableDebugMessage = 1
 
-function! sourcer#openTheSourceUnderCursor()
-  if s:findFromImportLine()
+function! sourcer#OpenTheSourceUnderCursor()
+  if s:FindFromImportLine()
     return
   endif
 
-  if s:findFromExactWordStrategy()
+  if s:FindFromExactWordStrategy()
     return
   endif
 
-  if s:findFromFuzzyEndStrategy()
+  if s:FindFromFuzzyEndStrategy()
     return
   endif
 
   echom "Not found any source map with name: " . expand('<cword>')
 endfunction
 
-function s:findFromFuzzyEndStrategy()
+function s:FindFromFuzzyEndStrategy()
   " If no results found, process searching the file which has current word *
-  let queryStringFuzzyTheEnd = s:buildQueryString('fuzzy-end')
-  let resultsFromFind = system(expand(l:queryStringFuzzyTheEnd))
+  let queryStringFuzzyTheEnd = s:BuildQueryString('fuzzy-end')
+  echomsg l:queryStringFuzzyTheEnd
 
-  let results = s:filterFoundResults(split(resultsFromFind, "\n"))
+  let resultsFromFind = systemlist(expand(l:queryStringFuzzyTheEnd))
+
+  let results = s:FilterFoundResults(l:resultsFromFind)
 
   if len(results) == 1
     execute "edit " results[0]
@@ -38,12 +40,12 @@ function s:findFromFuzzyEndStrategy()
   return 0
 endfunction
 
-function s:findFromExactWordStrategy()
+function s:FindFromExactWordStrategy()
   " If no results found, process searching the file which has exact the current word
-  let queryStringExactName = s:buildQueryString('exact-word')
-  let resultsFromFind = system(expand(l:queryStringExactName))
+  let queryStringExactName = s:BuildQueryString('exact-word')
+  let resultsFromFind = systemlist(expand(l:queryStringExactName))
 
-  let results = s:filterFoundResults(split(resultsFromFind, "\n"))
+  let results = s:FilterFoundResults(resultsFromFind)
 
   if len(results) == 1
     execute ":edit " results[0]
@@ -61,7 +63,7 @@ function s:findFromExactWordStrategy()
   return 0
 endfunction
 
-function s:findFromImportLine()
+function s:FindFromImportLine()
   " Handle for the case the cursor is at `import` line - current limit is only open java, but happy case is if not found then trying to find a file name match to current word -> the result is mostly kotlin
   " getline('.') import org.springframework.http.HttpStatus
   let words = split(getline('.'), '\W\+') " [import, org, spring, http, HttpStatus]
@@ -79,7 +81,7 @@ function s:findFromImportLine()
     return 1
   endif
 
-  let currentProjectSourcePath = getcwd() . '/app/src/main/kotlin/' . buildRelativeSourcePath . '.kt'
+  let currentProjectSourcePath = getcwd() . '/src/main/java/' . buildRelativeSourcePath . '.java'
   if filereadable(expand(l:currentProjectSourcePath)) " check file exists then open it up
     execute ":edit " currentProjectSourcePath
     call s:debug("Found from current project source path")
@@ -95,26 +97,25 @@ function s:debug(message)
   endif
 endfunction
 
-function s:buildQueryString(queryType)
+function s:BuildQueryString(queryType)
   let query = ''
   if getcwd() == g:libPath
-    let query .= "find " . g:libPath
+    let query .= "rg --files " . g:libPath
   else
-    let query .= "find . " . g:libPath " maybe replace . with getcwd() but for easier differenticate from the results which sources from current folder or lib, just let be there
+    let query .= "rg --files . " . g:libPath " maybe replace . with getcwd() but for easier differenticate from the results which sources from current folder or lib, just let be there
   endif
 
-  let query .= " -type f -not -path '*.git*' -not -path '*app/build*' -not -path '*app/gradle*' -not -path '*app/output*' -not -path '*app/.gradle-home*' -not -path '*data/db*'"
   if a:queryType == 'exact-word'
-    let query .= " -name '" . expand('<cword>') . ".kt' -o -name '" . expand('<cword>') . ".java'"
+    let query .= " | rg '" . expand('<cword>') . ".java'"
   elseif a:queryType == 'fuzzy-end'
-    let query .= " -name '" . expand('<cword>') . "*'"
+    let query .= " | rg '" . expand('<cword>') . "*'"
   else
-    throw 'No queryType from function buildQueryString match'
+    throw 'No queryType from function BuildQueryString match'
   endif
 
   return query
 endfunction
 
-function s:filterFoundResults(results)
+function s:FilterFoundResults(results)
   return filter(a:results, 'v:val !~ "Permission denied"') " filter array of strings which contains 'Permission denied'
 endfunction
