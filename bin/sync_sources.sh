@@ -27,3 +27,5 @@ done
 
 unzip "$javaHomeSrcZipPath" -d "$libPath"
 echo "Sync sources sucessfully"
+
+cd $libPath && git init

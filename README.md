@@ -7,7 +7,7 @@ This is still under development - not ready to use
 
 ### Using [vim-plug](https://github.com/junegunn/vim-plug)
 ```vim
-Plug 'quangnguyen30192/java-find-sources'
+Plug 'quangnguyen30192/java-find-sources', { 'for': 'java' }
 ```
 
 ## Quick Start
