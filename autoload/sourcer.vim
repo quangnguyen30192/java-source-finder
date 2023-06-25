@@ -1,6 +1,4 @@
-" Currently support java and kotlin
-let g:findSourceJavaLibPath = $HOME . '/dev/software/sources/java'
-let g:findSourceEnableDebugMessage = 1 " 0 means false, otherwise true
+let g:findSourceEnableDebugMessage = 1
 
 function! sourcer#openTheSourceUnderCursor()
   if s:findFromImportLine()
@@ -72,7 +70,7 @@ function s:findFromImportLine()
   endif
 
   let buildRelativeSourcePath  = join(words[1:], '/') " words[1:] to remove the import word: org, spring, http, HttpStatus => result: org/spring/http/HttpStatus
-  let absoluteSourcePath = g:findSourceJavaLibPath . '/' . buildRelativeSourcePath . '.java'
+  let absoluteSourcePath = g:libPath . '/' . buildRelativeSourcePath . '.java'
 
   " expand(l:absoluteSourcePath) => filereadable accepts a string => this is to turn absoluteSourcePath to a string
   if filereadable(expand(l:absoluteSourcePath)) " check file exists then open it up
@@ -99,10 +97,10 @@ endfunction
 
 function s:buildQueryString(queryType)
   let query = ''
-  if getcwd() == g:findSourceJavaLibPath
-    let query .= "find " . g:findSourceJavaLibPath
+  if getcwd() == g:libPath
+    let query .= "find " . g:libPath
   else
-    let query .= "find . " . g:findSourceJavaLibPath " maybe replace . with getcwd() but for easier differenticate from the results which sources from current folder or lib, just let be there
+    let query .= "find . " . g:libPath " maybe replace . with getcwd() but for easier differenticate from the results which sources from current folder or lib, just let be there
   endif
 
   let query .= " -type f -not -path '*.git*' -not -path '*app/build*' -not -path '*app/gradle*' -not -path '*app/output*' -not -path '*app/.gradle-home*' -not -path '*data/db*'"
