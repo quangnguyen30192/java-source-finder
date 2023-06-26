@@ -23,12 +23,12 @@ M.run = function(open_cmd)
     return false
   end
 
-  local varResponse = vim.fn.system('rg -n "' .. cur_word .. ' =" -g "!tags"')
+  local varResponse = vim.fn.system('rg -n "' .. cur_word .. ' ="')
 
   -- print "call here"
   local found = fzf_pick_from_rg_response(open_cmd, varResponse, class_name)
   if not found then
-    local valResponse = vim.fn.system('rg -n "' .. cur_word .. ' =" -g "!tags"')
+    local valResponse = vim.fn.system('rg -n "' .. cur_word .. ' ="')
 
     return fzf_pick_from_rg_response(open_cmd, valResponse, class_name)
   end

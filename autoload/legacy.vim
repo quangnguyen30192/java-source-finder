@@ -36,12 +36,10 @@ function s:jumpToExactMatchPath(command, projectPath)
 
   let paths = [
         \ g:libPath . "/" . relativeSourcePath . '.java',
-        \ g:libPath . "/" . relativeSourcePath . '.kt',
         \ ]
 
   for srcPath in g:srcPath
     call add(paths, a:projectPath . srcPath . relativeSourcePath . '.java')
-    call add(paths, a:projectPath . srcPath . relativeSourcePath . '.kt')
   endfor
 
   for path in paths
@@ -67,12 +65,10 @@ fu s:jumpToMethod(command, projectPath)
 
   let paths = [
         \ g:libPath . "/" . relativeSourcePath . '.java',
-        \ g:libPath . "/" . relativeSourcePath . '.kt',
         \ ]
 
   for srcPath in g:srcPath
     call add(paths, a:projectPath . srcPath . relativeSourcePath . '.java')
-    call add(paths, a:projectPath . srcPath . relativeSourcePath . '.kt')
   endfor
 
   for path in paths
@@ -88,11 +84,8 @@ endfu
 
 function s:jumpToFileInSamePackage(command)
   let javaPath = expand("%:p:h") . '/' . expand('<cword>') . '.java'
-  let kotlinPath = expand("%:p:h") . '/' . expand('<cword>') . '.kt'
   let javaTestPath = substitute(expand("%:p:h"), "main", "test", "") . '/' . expand('<cword>') . '.java'
   let javaMainPath = substitute(expand("%:p:h"), "test", "main", "") . '/' . expand('<cword>') . '.java'
-  let kotlinTestPath = substitute(expand("%:p:h"), "main", "test", "") . '/' . expand('<cword>') . '.kt'
-  let kotlinMainPath = substitute(expand("%:p:h"), "test", "main", "") . '/' . expand('<cword>') . '.kt'
 
   for path in [javaPath, kotlinPath, javaTestPath, javaMainPath, kotlinTestPath, kotlinMainPath]
     if filereadable(expand(l:path))
@@ -105,7 +98,7 @@ function s:jumpToFileInSamePackage(command)
 endfunction
 
 function s:jumpToFileByFuzzySearch(command, path)
-  let queryStringExactName = "find " . a:path . " -type f -name '" . expand('<cword>'). ".java' -o -name '" . expand('<cword>'). ".kt'"
+  let queryStringExactName = "find " . a:path . " -type f -name '" . expand('<cword>'). ".java'"
   let resultsFromFind = system(expand(l:queryStringExactName))
   let results = split(resultsFromFind, "\n")
 

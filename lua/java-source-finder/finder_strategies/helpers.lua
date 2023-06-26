@@ -105,7 +105,6 @@ M.convert_import_line_to_file_path = function(line)
 
   local paths = {}
 
-  M.build_paths(paths, relative_path .. ".kt")
   M.build_paths(paths, relative_path .. ".java")
   -- vim.print(paths)
 
@@ -124,8 +123,6 @@ M.convert_import_line_to_folder_path = function(line)
   return paths
 end
 
--- Handle the response from ripgrep
--- Ex: subscription/infrastructure/Logger.kt:63: const val COMPANY_ID_LOG_KEY = "company_id"\n
 M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
   if response ~= "" then
     local results = vim.fn.split(response, "\n")
@@ -134,27 +131,28 @@ M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
     local data = {}
 
     -- Build data and pickable options for fuzzy search
-    for i, result in ipairs(results) do
+    for _, result in ipairs(results) do
       local sp = vim.fn.split(result, ":")
       table.insert(data, sp)
       local file = sp[1]
-      local sample_code = string.gsub(sp[3], "%s+", "")
-      file = string.gsub(file, esc(vim.fn.getcwd(0)), "")
+      -- file = string.gsub(file, esc(vim.fn.getcwd(0)), "")
+      local sample_code = string.gsub(sp[3], "%s+ ", "")
       for _, src_path in ipairs(vim.g.srcPath) do
-        file = string.gsub(file, esc(src_path), "")
+        -- file = string.gsub(file, esc(src_path), "")
+        file = vim.fn.fnamemodify(file, ":p:t")
       end
 
       -- collect files matches with the given class_name the
       -- print(class_name)
       if class_name == nil then
-        table.insert(pickable, i .. ".  " .. sample_code .. "        " .. file)
+        table.insert(pickable,  sample_code .. " -> " .. file)
       else
-        if string.find(file:lower(), class_name:lower() .. ".kt") or string.find(file:lower(), class_name:lower() .. ".java") then
-          table.insert(pickable, i .. ".  " .. sample_code .. "        " .. file)
+        if string.find(file:lower(), class_name:lower() .. ".java") then
+          table.insert(pickable, sample_code .. " -> " .. file)
         end
 
         if not pickable[1] then
-          return fzf_pick_from_rg_response(open_cmd, response)
+          return M.fzf_pick_from_rg_response(open_cmd, response)
         end
       end
     end
@@ -197,7 +195,6 @@ M.convert_import_line_to_constant_file = function(line)
   local paths = {}
 
   M.build_paths(paths, file_path .. ".java")
-  M.build_paths(paths, file_path .. ".kt")
 
   return paths
 end

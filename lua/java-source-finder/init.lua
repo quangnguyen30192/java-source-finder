@@ -17,6 +17,9 @@ function M.run(...)
   isFound = isFound or find_constant_definition(open_cmd)
   isFound = isFound or find_function_definition(open_cmd)
   isFound = isFound or find_property_definition(open_cmd)
+  if not isFound then
+    vim.fn["sourcer#OpenTheSourceUnderCursor"]()
+  end
 end
 
 return M

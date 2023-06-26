@@ -4,16 +4,15 @@ local convert_import_line_to_folder_path = require('java-source-finder.finder_st
 local M = {}
 -- Find class or interface in the folder by name, ripgrep search, open the file and jump to correct line
 M.run = function(open_cmd)
-  -- print "jump_to_class_interface_in_path"
   local cur_word = vim.fn.expand("<cword>")
 
-  local line = find_import_line(cur_word)
+  local import_line = find_import_line(cur_word)
   local paths
 
-  if line == nil then
+  if import_line == nil then
     paths = {vim.fn.expand("%:p:h")}
   else
-    paths = convert_import_line_to_folder_path(line)
+    paths = convert_import_line_to_folder_path(import_line)
   end
 
   for _, path in ipairs(paths) do
@@ -21,7 +20,7 @@ M.run = function(open_cmd)
       goto skip_to_next
     end
 
-    local response = vim.fn.system('rg -n "(class|interface) ' .. cur_word .. '[<( {]" ' .. path)
+    local response = vim.fn.system('rg -n "(class|interface|enum) ' .. cur_word .. '[<( {]" ' .. path)
 
     if response ~= "" then
       local results = vim.fn.split(response, "\n")
