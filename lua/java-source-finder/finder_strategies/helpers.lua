@@ -1,25 +1,26 @@
 local fzf = require("fzf")
 local M = {}
 
-
 function file_exists(name)
-   local f = io.open(name, "r")
-   return f ~= nil and io.close(f)
+  local f = io.open(name, "r")
+  return f ~= nil and io.close(f)
 end
 
 function esc(x)
-  return (x:gsub('%%', '%%%%')
-    :gsub('^%^', '%%^')
-    :gsub('%$$', '%%$')
-    :gsub('%(', '%%(')
-    :gsub('%)', '%%)')
-    :gsub('%.', '%%.')
-    :gsub('%[', '%%[')
-    :gsub('%]', '%%]')
-    :gsub('%*', '%%*')
-    :gsub('%+', '%%+')
-    :gsub('%-', '%%-')
-    :gsub('%?', '%%?'))
+  return (
+    x:gsub("%%", "%%%%")
+      :gsub("^%^", "%%^")
+      :gsub("%$$", "%%$")
+      :gsub("%(", "%%(")
+      :gsub("%)", "%%)")
+      :gsub("%.", "%%.")
+      :gsub("%[", "%%[")
+      :gsub("%]", "%%]")
+      :gsub("%*", "%%*")
+      :gsub("%+", "%%+")
+      :gsub("%-", "%%-")
+      :gsub("%?", "%%?")
+  )
 end
 
 -- Loop through every lines in current buffer
@@ -28,9 +29,7 @@ local function find_class_inteface_in_file(word)
   for i = 1, vim.fn.line("$"), 1 do
     local l = vim.fn.getbufline(vim.fn.bufnr(), i)[1]
 
-    if string.find(l, "class " .. word) ~= nil
-      or string.find(l, "interface " .. word) ~= nil
-    then
+    if string.find(l, "class " .. word) ~= nil or string.find(l, "interface " .. word) ~= nil then
       return i
     end
   end
@@ -67,7 +66,6 @@ M.try_to_jump = function(open_cmd, paths, word)
 
   return false
 end
-
 
 -- The file can be in library or project, try to build file path using all possible source location
 M.build_paths = function(paths, file_path)
@@ -145,7 +143,7 @@ M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
       -- collect files matches with the given class_name the
       -- print(class_name)
       if class_name == nil then
-        table.insert(pickable,  sample_code .. " -> " .. file)
+        table.insert(pickable, sample_code .. " -> " .. file)
       else
         if string.find(file:lower(), class_name:lower() .. ".java") then
           table.insert(pickable, sample_code .. " -> " .. file)
@@ -157,6 +155,7 @@ M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
       end
     end
 
+    vim.print(data)
     if #data == 1 then
       -- Jump to file directly if there is only one result
       local line_no = data[1][2]
@@ -169,7 +168,7 @@ M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
       if next(pickable) then
         -- Use fuzzy search if there are many possible results
         coroutine.wrap(function()
-          local selections = fzf.fzf(pickable, "--ansi", { width = 250, height = 60, })
+          local selections = fzf.fzf(pickable, "--ansi", { width = 250, height = 60 })
           for _, select in ipairs(selections) do
             r = select
           end
@@ -195,6 +194,18 @@ M.convert_import_line_to_constant_file = function(line)
   local paths = {}
 
   M.build_paths(paths, file_path .. ".java")
+
+  return paths
+end
+
+M.convert_import_line_to_package_paths = function(import_line)
+  local words = vim.fn.split(import_line, [[\W\+]])
+  table.remove(words, #words)
+  table.remove(words, 1)
+  local file_path = table.concat(words, "/")
+  local paths = {}
+
+  M.build_paths(paths, file_path)
 
   return paths
 end

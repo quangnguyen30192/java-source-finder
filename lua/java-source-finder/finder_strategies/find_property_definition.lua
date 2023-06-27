@@ -1,4 +1,4 @@
-local fzf_pick_from_rg_response = require('java-source-finder.finder_strategies.helpers').fzf_pick_from_rg_response
+local fzf_pick_from_rg_response = require("java-source-finder.finder_strategies.helpers").fzf_pick_from_rg_response
 local M = {}
 
 M.run = function(open_cmd)
@@ -11,7 +11,7 @@ M.run = function(open_cmd)
   end
 
   -- make sure it has ( which means the function call
-  if string.find(full_word, cur_word .. '(', nil, true) then
+  if string.find(full_word, cur_word .. "(", nil, true) then
     return false
   end
   -- print "is prop call"

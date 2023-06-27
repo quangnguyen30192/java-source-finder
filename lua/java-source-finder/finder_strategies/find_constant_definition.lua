@@ -1,8 +1,12 @@
-local find_import_line = require('java-source-finder.finder_strategies.helpers').find_import_line
-local try_to_jump = require('java-source-finder.finder_strategies.helpers').try_to_jump
-local fzf_pick_from_rg_response = require('java-source-finder.finder_strategies.helpers').fzf_pick_from_rg_response
-local convert_import_line_to_constant_file = require('java-source-finder.finder_strategies.helpers').convert_import_line_to_constant_file
-local convert_import_line_to_file_path = require('java-source-finder.finder_strategies.helpers').convert_import_line_to_file_path
+local find_import_line = require("java-source-finder.finder_strategies.helpers").find_import_line
+local try_to_jump = require("java-source-finder.finder_strategies.helpers").try_to_jump
+local fzf_pick_from_rg_response = require("java-source-finder.finder_strategies.helpers").fzf_pick_from_rg_response
+local convert_import_line_to_constant_file =
+  require("java-source-finder.finder_strategies.helpers").convert_import_line_to_constant_file
+local convert_import_line_to_file_path =
+  require("java-source-finder.finder_strategies.helpers").convert_import_line_to_file_path
+local convert_import_line_to_package_paths =
+  require("java-source-finder.finder_strategies.helpers").convert_import_line_to_package_paths
 local M = {}
 
 local function filter_existing_folders(folders)
@@ -10,7 +14,7 @@ local function filter_existing_folders(folders)
 
   for _, folder in ipairs(folders) do
     if vim.fn.isdirectory(folder) == 1 then
-      table.insert(result,folder)
+      table.insert(result, folder)
     end
   end
 

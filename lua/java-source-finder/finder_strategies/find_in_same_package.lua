@@ -1,4 +1,4 @@
-local try_to_jump = require('java-source-finder.finder_strategies.helpers').try_to_jump
+local try_to_jump = require("java-source-finder.finder_strategies.helpers").try_to_jump
 
 local M = {}
 -- Try to find the file which is on the same package, because java file doesn't need to import that file
@@ -15,6 +15,5 @@ M.run = function(open_cmd, filename)
 
   return try_to_jump(open_cmd, paths, cur_word)
 end
-
 
 return M

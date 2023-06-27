@@ -1,4 +1,4 @@
-local fzf_pick_from_rg_response = require('java-source-finder.finder_strategies.helpers').fzf_pick_from_rg_response
+local fzf_pick_from_rg_response = require("java-source-finder.finder_strategies.helpers").fzf_pick_from_rg_response
 local M = {}
 
 M.run = function(open_cmd)
@@ -18,24 +18,28 @@ M.run = function(open_cmd)
   end
 
   -- make sure it has ( which means the function call
-  if not string.find(full_word, cur_word .. '(', nil, true) then
+  if not string.find(full_word, cur_word .. "(", nil, true) then
     return false
   end
-  -- print "is function call"
-  local response = vim.fn.system('rg -n "fun ' .. cur_word .. '\\(" -g "!tags"')
+  local cmd = 'rg -n " ' .. cur_word .. '\\(\\w+ \\w+"'
+  vim.print(cmd)
+  local response = vim.fn.system(cmd)
 
-  return fzf_pick_from_rg_response(open_cmd, response, class_name)
+  if not fzf_pick_from_rg_response(open_cmd, response, class_name) then
+    response = vim.fn.system(cmd .. " " .. vim.g.libPath)
+    fzf_pick_from_rg_response(open_cmd, response, class_name)
+  end
   -- local line = find_import_line(class_name)
   -- if line == nil then
-    -- print "assume file in the same package"
-    -- return jump_file_same_package(open_cmd, class_name)
+  -- print "assume file in the same package"
+  -- return jump_file_same_package(open_cmd, class_name)
   -- local fzf_pick_from_rg_response = require('java-source-finder.finder_strategies.helpers').fzf_pick_from_rg_response
   -- local convert_import_line_to_constant_file = require('java-source-finder.finder_strategies.helpers').convert_import_line_to_constant_file
   -- else
-    -- local file_paths = convert_import_line_to_file_path(line)
+  -- local file_paths = convert_import_line_to_file_path(line)
 
-    -- print "Try to jump"
-    -- return try_to_jump(open_cmd, file_paths, class_name)
+  -- print "Try to jump"
+  -- return try_to_jump(open_cmd, file_paths, class_name)
   -- end
 end
 

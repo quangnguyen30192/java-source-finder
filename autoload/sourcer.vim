@@ -19,7 +19,6 @@ endfunction
 function s:FindFromFuzzyEndStrategy()
   " If no results found, process searching the file which has current word *
   let queryStringFuzzyTheEnd = s:BuildQueryString('fuzzy-end')
-  echomsg l:queryStringFuzzyTheEnd
 
   let resultsFromFind = systemlist(expand(l:queryStringFuzzyTheEnd))
 
