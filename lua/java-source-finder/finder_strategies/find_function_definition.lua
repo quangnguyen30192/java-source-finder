@@ -18,7 +18,7 @@ M.run = function(open_cmd)
 
   -- assume class_name is the first part of pieces with first capitalize letter
   local class_name = string.gsub(string.gsub(pieces[1], ".*[(]", ""), "^%l", string.upper)
-  if not class_name then
+  if not class_name or vim.fn.empty(class_name) then
     return false
   end
 

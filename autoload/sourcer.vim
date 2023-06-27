@@ -2,18 +2,18 @@ let g:findSourceEnableDebugMessage = 1
 
 function! sourcer#OpenTheSourceUnderCursor()
   if s:FindFromImportLine()
-    return
+    return 1
   endif
 
   if s:FindFromExactWordStrategy()
-    return
+    return 1
   endif
 
   if s:FindFromFuzzyEndStrategy()
-    return
+    return 1
   endif
 
-  echom "Not found any source map with name: " . expand('<cword>')
+  return 0
 endfunction
 
 function s:FindFromFuzzyEndStrategy()

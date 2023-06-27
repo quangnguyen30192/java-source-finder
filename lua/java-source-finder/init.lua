@@ -19,9 +19,15 @@ function M.run(...)
   isFound = isFound or find_property_definition(open_cmd)
   -- find function definition improvement: for search by the cm 'rg -n " ' .. method_name .. '\\(\\w+ \\w+"' at src and local project
    -- find enum definition
+  -- refactor helpers
+  -- convert sourcer to lua
   if not isFound then
-    vim.fn["sourcer#OpenTheSourceUnderCursor"]()
+    isFound = vim.fn["sourcer#OpenTheSourceUnderCursor"]()
+    if isFound == 0 then
+      vim.cmd("AnyJump")
+    end
   end
+
 end
 
 return M

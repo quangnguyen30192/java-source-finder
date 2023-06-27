@@ -81,16 +81,13 @@ end
 
 -- Loop through all lines in file, try to find the line with import pattern "import ... word$"
 M.find_import_line = function(word)
-  -- print("try import")
   for i = 1, vim.fn.line("$"), 1 do
     local line = vim.fn.getbufline(vim.fn.bufnr(), i)[1]
 
     if string.find(line, "import") == 1 and string.match(line, "[.]" .. word .. ";$") ~= nil then
-      -- print("found " .. line)
       return line
     end
 
-    -- print("could not find import line")
   end
 
   return nil
