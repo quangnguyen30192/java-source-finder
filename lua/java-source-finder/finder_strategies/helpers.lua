@@ -155,7 +155,7 @@ M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
       end
     end
 
-    vim.print(data)
+    -- vim.print(data)
     if #data == 1 then
       -- Jump to file directly if there is only one result
       local line_no = data[1][2]

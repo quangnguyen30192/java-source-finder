@@ -17,6 +17,8 @@ function M.run(...)
   isFound = isFound or find_constant_definition(open_cmd)
   isFound = isFound or find_function_definition(open_cmd)
   isFound = isFound or find_property_definition(open_cmd)
+  -- find function definition improvement: for search by the cm 'rg -n " ' .. method_name .. '\\(\\w+ \\w+"' at src and local project
+   -- find enum definition
   if not isFound then
     vim.fn["sourcer#OpenTheSourceUnderCursor"]()
   end

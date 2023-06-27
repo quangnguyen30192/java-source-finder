@@ -1,46 +1,39 @@
-local fzf_pick_from_rg_response = require("java-source-finder.finder_strategies.helpers").fzf_pick_from_rg_response
+local find_import_line = require('java-source-finder.finder_strategies.helpers').find_import_line
+local jump_file_same_package = require('java-source-finder.finder_strategies.find_in_same_package').run
+local try_to_jump = require("java-source-finder.finder_strategies.helpers").try_to_jump
+local convert_import_line_to_file_path =
+  require("java-source-finder.finder_strategies.helpers").convert_import_line_to_file_path
+
 local M = {}
 
+-- covers for a line of function call merely function.call(a)
 M.run = function(open_cmd)
-  -- print("jump_to_function_definition")
-  local cur_word = vim.fn.expand("<cword>")
-  local full_word = vim.fn.expand("<cWORD>")
+  local method_name = vim.fn.expand("<cword>")
+  local function_call_line = vim.fn.expand("<cWORD>")
 
-  if not string.find(full_word, ".") then
+  if not string.find(function_call_line, ".") then
     return false
   end
-  local kw = vim.fn.split(full_word, [[\.]])
+  local pieces = vim.fn.split(function_call_line, [[\.]])
 
-  -- assume class_name is the first part of kw with first capitalize letter
-  local class_name = string.gsub(string.gsub(kw[1], ".*[(]", ""), "^%l", string.upper)
+  -- assume class_name is the first part of pieces with first capitalize letter
+  local class_name = string.gsub(string.gsub(pieces[1], ".*[(]", ""), "^%l", string.upper)
   if not class_name then
     return false
   end
 
   -- make sure it has ( which means the function call
-  if not string.find(full_word, cur_word .. "(", nil, true) then
+  if not string.find(function_call_line, method_name .. "(", nil, true) then
     return false
   end
-  local cmd = 'rg -n " ' .. cur_word .. '\\(\\w+ \\w+"'
-  vim.print(cmd)
-  local response = vim.fn.system(cmd)
 
-  if not fzf_pick_from_rg_response(open_cmd, response, class_name) then
-    response = vim.fn.system(cmd .. " " .. vim.g.libPath)
-    fzf_pick_from_rg_response(open_cmd, response, class_name)
+  local import_line = find_import_line(class_name)
+  if import_line == nil then
+    return jump_file_same_package(open_cmd, class_name, method_name)
+  else
+    local file_paths = convert_import_line_to_file_path(import_line)
+    return try_to_jump(open_cmd, file_paths, method_name)
   end
-  -- local line = find_import_line(class_name)
-  -- if line == nil then
-  -- print "assume file in the same package"
-  -- return jump_file_same_package(open_cmd, class_name)
-  -- local fzf_pick_from_rg_response = require('java-source-finder.finder_strategies.helpers').fzf_pick_from_rg_response
-  -- local convert_import_line_to_constant_file = require('java-source-finder.finder_strategies.helpers').convert_import_line_to_constant_file
-  -- else
-  -- local file_paths = convert_import_line_to_file_path(line)
-
-  -- print "Try to jump"
-  -- return try_to_jump(open_cmd, file_paths, class_name)
-  -- end
 end
 
 return M
