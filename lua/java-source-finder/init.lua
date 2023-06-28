@@ -7,6 +7,7 @@ local find_property_definition = require("java-source-finder.finder_strategies.f
 local M = {}
 
 function M.run(...)
+  vim.g.debug_enable = true
   local args = { ... }
   local open_cmd = args[0] or "e"
   local isFound = false
@@ -17,7 +18,7 @@ function M.run(...)
   isFound = isFound or find_constant_definition(open_cmd)
   isFound = isFound or find_function_definition(open_cmd)
   isFound = isFound or find_property_definition(open_cmd)
-  -- find function definition improvement: for search by the cm 'rg -n " ' .. method_name .. '\\(\\w+ \\w+"' at src and local project
+  -- find function definition improvement: for search by the cm 'rg -n " public ' .. method_name .. '\\(\\w+ \\w+"' at src and local project
    -- find enum definition
   -- refactor helpers
   -- convert sourcer to lua

@@ -17,8 +17,8 @@ M.run = function(open_cmd)
   local pieces = vim.fn.split(function_call_line, [[\.]])
 
   -- assume class_name is the first part of pieces with first capitalize letter
-  local class_name = string.gsub(string.gsub(pieces[1], ".*[(]", ""), "^%l", string.upper)
-  if not class_name or vim.fn.empty(class_name) then
+  local class_name = string.gsub(string.gsub(pieces[1], ".*[!(]", ""), "^%l", string.upper)
+  if not class_name or vim.fn.empty(class_name) == 1 then
     return false
   end
 

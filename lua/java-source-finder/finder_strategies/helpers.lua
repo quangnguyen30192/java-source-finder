@@ -25,11 +25,16 @@ end
 
 -- Loop through every lines in current buffer
 -- Find the first line contains the class or interface with given name
-local function find_class_inteface_in_file(word)
+local function find_definitions_in_file(word)
   for i = 1, vim.fn.line("$"), 1 do
     local l = vim.fn.getbufline(vim.fn.bufnr(), i)[1]
 
-    if string.find(l, "class " .. word) ~= nil or string.find(l, "interface " .. word) ~= nil then
+    if string.find(l, "class " .. word) ~= nil
+            or string.find(l, "interface " .. word) ~= nil
+            or string.find(l, "enum " .. word) ~= nil
+            or string.match(l, "public %w+ " .. word)
+            or string.match(l, "public %w+ %w+ " .. word)
+        then
       return i
     end
   end
@@ -57,7 +62,7 @@ M.try_to_jump = function(open_cmd, paths, word)
   for _, path in ipairs(paths) do
     if file_exists(path) then
       vim.cmd(open_cmd .. " " .. path)
-      local found_line = find_class_inteface_in_file(word) or find_word_in_file(word)
+      local found_line = find_definitions_in_file(word) or find_word_in_file(word)
       vim.cmd(tostring(found_line))
 
       return true
@@ -205,6 +210,12 @@ M.convert_import_line_to_package_paths = function(import_line)
   M.build_paths(paths, file_path)
 
   return paths
+end
+
+M.debug = function(...)
+    if vim.g.debug_enable then
+        vim.print(...)
+    end
 end
 
 return M
