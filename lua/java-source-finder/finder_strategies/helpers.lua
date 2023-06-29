@@ -32,11 +32,12 @@ local function find_definitions_in_file(word)
     if string.find(l, "class " .. word) ~= nil
             or string.find(l, "interface " .. word) ~= nil
             or string.find(l, "enum " .. word) ~= nil
-            or string.match(l, "public %w+ " .. word)
             or string.match(l, "public %w+ %w+ " .. word)
             or string.match(l, "public %w+ " .. word)
             or string.match(l, "protected %w+ %w+ " .. word)
+            or string.match(l, "protected %w+ " .. word)
             or string.match(l, "private %w+ %w+ " .. word)
+            or string.match(l, "private %w+ " .. word)
         then
       return i
     end

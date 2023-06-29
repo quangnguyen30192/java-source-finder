@@ -12,9 +12,11 @@ Plug 'quangnguyen30192/java-find-sources', { 'for': 'java' }
 
 ## Quick Start
 Run JavaSyncSources to sync the sources jar from your local repository to a central sources
+
+Bind the keymap (encourage to map to `gf` as it works like `gf` in vim)
 ```vimscript
-nmap gf :JavaFindSources<cr>
-nmap gT :JavaFindSources tabedit<cr>
+nnoremap gf :JavaFindSources<cr>
+nnoremap gT :JavaFindSources tabedit<cr>
 ```
 
 ## Commands
