@@ -43,7 +43,7 @@ M.run = function(open_cmd)
     if line == nil then
       local path = vim.fn.expand("%:p:h")
 
-      local response = vim.fn.system('rg -n "val ' .. cur_word .. '" ' .. path)
+      local response = vim.fn.systemlist('rg -n "val ' .. cur_word .. '" ' .. path)
 
       return fzf_pick_from_rg_response(open_cmd, response)
     else
@@ -56,7 +56,7 @@ M.run = function(open_cmd)
         local existing_folders = filter_existing_folders(package_paths)
         local search_folders = table.concat(existing_folders, " ")
 
-        local response = vim.fn.system('rg -n "val ' .. cur_word .. '" ' .. search_folders)
+        local response = vim.fn.systemlist('rg -n "val ' .. cur_word .. '" ' .. search_folders)
 
         return fzf_pick_from_rg_response(open_cmd, response)
       end
@@ -76,7 +76,7 @@ M.run = function(open_cmd)
     if line == nil then
       local path = vim.fn.expand("%:p:h")
 
-      local response = vim.fn.system('rg -n "val ' .. cur_word .. '" ' .. path)
+      local response = vim.fn.systemlist('rg -n "val ' .. cur_word .. '" ' .. path)
 
       return fzf_pick_from_rg_response(open_cmd, response)
     else

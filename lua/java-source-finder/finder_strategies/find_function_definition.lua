@@ -3,8 +3,19 @@ local jump_file_same_package = require('java-source-finder.finder_strategies.fin
 local try_to_jump = require("java-source-finder.finder_strategies.helpers").try_to_jump
 local convert_import_line_to_file_path =
   require("java-source-finder.finder_strategies.helpers").convert_import_line_to_file_path
+local try_to_jump_current_file = require('java-source-finder.finder_strategies.helpers').try_to_jump_current_file
+local fzf_rg = require('java-source-finder.finder_strategies.helpers').fzf_pick_from_rg_response
 
 local M = {}
+
+local function find_function_same_package(open_cmd)
+    local cur_dir = vim.fn.expand("%:p:h")
+    local fnName = vim.fn.expand("<cword>")
+    local cmd = 'rg "public \\w+ ' .. fnName .. '" -t java --vimgrep ' .. cur_dir
+
+    local filesMatched = vim.fn.systemlist(cmd)
+    return fzf_rg(open_cmd, filesMatched, 'sda')
+end
 
 -- covers for a line of function call merely function.call(a)
 M.run = function(open_cmd)
@@ -17,9 +28,9 @@ M.run = function(open_cmd)
   local pieces = vim.fn.split(function_call_line, [[\.]])
 
   -- assume class_name is the first part of pieces with first capitalize letter
-  local class_name = string.gsub(string.gsub(pieces[1], ".*[!(]", ""), "^%l", string.upper)
+  local class_name = string.gsub(string.gsub(pieces[1], ".*[!();]", ""), "^%l", string.upper)
   if not class_name or vim.fn.empty(class_name) == 1 then
-    return false
+    return try_to_jump_current_file(method_name) or find_function_same_package(open_cmd)
   end
 
   -- make sure it has ( which means the function call

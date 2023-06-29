@@ -34,6 +34,9 @@ local function find_definitions_in_file(word)
             or string.find(l, "enum " .. word) ~= nil
             or string.match(l, "public %w+ " .. word)
             or string.match(l, "public %w+ %w+ " .. word)
+            or string.match(l, "public %w+ " .. word)
+            or string.match(l, "protected %w+ %w+ " .. word)
+            or string.match(l, "private %w+ %w+ " .. word)
         then
       return i
     end
@@ -70,6 +73,16 @@ M.try_to_jump = function(open_cmd, paths, word)
   end
 
   return false
+end
+
+M.try_to_jump_current_file = function(word)
+    local found_line = find_definitions_in_file(word)
+    if found_line then
+        vim.cmd(tostring(found_line))
+        return true
+    end
+
+    return false
 end
 
 -- The file can be in library or project, try to build file path using all possible source location
@@ -125,13 +138,11 @@ end
 
 M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
   if response ~= "" then
-    local results = vim.fn.split(response, "\n")
-
     local pickable = {}
     local data = {}
 
     -- Build data and pickable options for fuzzy search
-    for _, result in ipairs(results) do
+    for _, result in ipairs(response) do
       local sp = vim.fn.split(result, ":")
       table.insert(data, sp)
       local file = sp[1]
@@ -168,7 +179,7 @@ M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
     else
       -- vim.print(pickable)
       if next(pickable) then
-        -- Use fuzzy search if there are many possible results
+        -- Use fuzzy search if there are many possible response
         coroutine.wrap(function()
           local selections = fzf.fzf(pickable, "--ansi", { width = 250, height = 60 })
           for _, select in ipairs(selections) do

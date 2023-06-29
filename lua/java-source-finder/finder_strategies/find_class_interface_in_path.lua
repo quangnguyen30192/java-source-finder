@@ -20,9 +20,8 @@ M.run = function(open_cmd)
       goto skip_to_next
     end
 
-    local response = vim.fn.system('rg -n "(class|interface|enum) ' .. cur_word .. '[<( {]" ' .. path)
-
-    if response ~= "" then
+    local response = vim.fn.systemlist('rg -n "(class|interface|enum) ' .. cur_word .. '" ' .. path)
+    if vim.fn.empty(response) == 0 then
       local results = vim.fn.split(response, "\n")
 
       for _, result in ipairs(results) do
