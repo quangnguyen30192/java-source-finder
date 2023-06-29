@@ -20,10 +20,8 @@ M.run = function(open_cmd)
       goto skip_to_next
     end
 
-    local response = vim.fn.systemlist('rg -n "(class|interface|enum) ' .. cur_word .. '" ' .. path)
-    if vim.fn.empty(response) == 0 then
-      local results = vim.fn.split(response, "\n")
-
+    local results = vim.fn.systemlist('rg -n "(class|interface|enum) ' .. cur_word .. '" ' .. path)
+    if vim.fn.empty(results) == 0 then
       for _, result in ipairs(results) do
         local split = vim.fn.split(result, ":")
         local file_path = split[1]
