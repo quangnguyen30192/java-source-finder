@@ -10,25 +10,21 @@ function M.run(...)
   vim.g.debug_enable = true
   local args = { ... }
   local open_cmd = args[0] or "e"
-  local isFound = false
+  local isFound = find_in_same_package(open_cmd)
+    or find_exact_match_path(open_cmd)
+    or find_class_interface_in_path(open_cmd)
+    or find_constant_definition(open_cmd)
+    or find_function_definition(open_cmd)
+    or find_property_definition(open_cmd)
+    or vim.fn["sourcer#OpenTheSourceUnderCursor"]() == 1
 
-  isFound = isFound or find_in_same_package(open_cmd)
-  isFound = isFound or find_exact_match_path(open_cmd)
-  isFound = isFound or find_class_interface_in_path(open_cmd)
-  isFound = isFound or find_constant_definition(open_cmd)
-  isFound = isFound or find_function_definition(open_cmd)
-  isFound = isFound or find_property_definition(open_cmd)
   -- find function definition improvement: for search by the cm 'rg -n " public ' .. method_name .. '\\(\\w+ \\w+"' at src and local project
-   -- find enum definition
+  -- find enum definition
   -- refactor helpers
   -- convert sourcer to lua
   if not isFound then
-    isFound = vim.fn["sourcer#OpenTheSourceUnderCursor"]()
-    if isFound == 0 then
-      vim.cmd("AnyJump")
-    end
+    vim.cmd("AnyJump")
   end
-
 end
 
 return M

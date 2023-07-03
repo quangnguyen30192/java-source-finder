@@ -23,27 +23,45 @@ function esc(x)
   )
 end
 
+local defition_keywords = {
+  "enum",
+  "class",
+  "interface",
+  "protected",
+  "public",
+  "private",
+}
+
+local function is_definitions_line(line, symbol)
+  for _, def_word in ipairs(defition_keywords) do
+    if vim.startswith(line, def_word) and string.match(line, symbol) ~= nil then
+      return true
+    end
+  end
+
+  return false
+end
+
 -- Loop through every lines in current buffer
 -- Find the first line contains the class or interface with given name
-local function find_definitions_in_file(word)
+local function find_definitions_in_file(symbol)
   for i = 1, vim.fn.line("$"), 1 do
-    local l = vim.fn.getbufline(vim.fn.bufnr(), i)[1]
+    local line = vim.trim(vim.fn.getbufline(vim.fn.bufnr(), i)[1])
 
-    if string.find(l, "class " .. word) ~= nil
-            or string.find(l, "interface " .. word) ~= nil
-            or string.find(l, "enum " .. word) ~= nil
-            or string.match(l, "public %w+ %w+ " .. word)
-            or string.match(l, "public %w+ " .. word)
-            or string.match(l, "protected %w+ %w+ " .. word)
-            or string.match(l, "protected %w+ " .. word)
-            or string.match(l, "private %w+ %w+ " .. word)
-            or string.match(l, "private %w+ " .. word)
-        then
+    if is_definitions_line(line, symbol) then
       return i
     end
   end
 
   return nil
+end
+
+function M.find_function_same_package(open_cmd)
+  local cur_dir = vim.fn.expand("%:p:h")
+  local fnName = vim.fn.expand("<cword>")
+  local cmd = 'rg "' .. fnName .. '" -t java --vimgrep ' .. cur_dir
+
+  return M.fzf_find_function_definition_from_cmd_response(open_cmd, cmd, fnName)
 end
 
 -- Loop through every lines in current buffer
@@ -77,13 +95,13 @@ M.try_to_jump = function(open_cmd, paths, word)
 end
 
 M.try_to_jump_current_file = function(word)
-    local found_line = find_definitions_in_file(word)
-    if found_line then
-        vim.cmd(tostring(found_line))
-        return true
-    end
+  local found_line = find_definitions_in_file(word)
+  if found_line then
+    vim.cmd(tostring(found_line))
+    return true
+  end
 
-    return false
+  return false
 end
 
 -- The file can be in library or project, try to build file path using all possible source location
@@ -106,7 +124,6 @@ M.find_import_line = function(word)
     if string.find(line, "import") == 1 and string.match(line, "[.]" .. word .. ";$") ~= nil then
       return line
     end
-
   end
 
   return nil
@@ -200,6 +217,49 @@ M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
   end
 end
 
+M.fzf_find_function_definition_from_cmd_response = function(open_cmd, cmd, symbol)
+  local filesMatched = vim.fn.systemlist(cmd)
+  if filesMatched == "" then
+    return false
+  end
+
+  local pickable = {}
+  local data = {}
+
+  for _, fileMatched in ipairs(filesMatched) do
+    local pieces = vim.fn.split(fileMatched, ":")
+    local file = pieces[1]
+    -- local lineNr = pieces[2]
+    local line = vim.trim(pieces[4])
+    if is_definitions_line(line, symbol) then
+      table.insert(data, pieces)
+      local sample_code = string.gsub(line, "%s+ ", "")
+      table.insert(pickable, #data .. "." .. sample_code .. " -> " .. file)
+    end
+  end
+
+  if #data == 1 then
+    local line_no = data[1][2]
+    local file_path = data[1][1]
+
+    vim.cmd(open_cmd .. " +" .. line_no .. " " .. file_path)
+    return true
+  elseif next(pickable) then
+    coroutine.wrap(function()
+      local selections = fzf.fzf(pickable, "--ansi", { width = 250, height = 60 })
+      local selected = selections[2]
+
+      local i = tonumber(string.sub(selected, 1, 1))
+      local line_no = data[i][2]
+      local file_path = data[i][1]
+      vim.cmd(open_cmd .. " +" .. line_no .. " " .. file_path)
+    end)()
+    return true
+  end
+
+  return false
+end
+
 M.convert_import_line_to_constant_file = function(line)
   local words = vim.fn.split(line, [[\W\+]])
   table.remove(words, #words)
@@ -225,9 +285,9 @@ M.convert_import_line_to_package_paths = function(import_line)
 end
 
 M.debug = function(...)
-    if vim.g.debug_enable then
-        vim.print(...)
-    end
+  if vim.g.debug_enable then
+    vim.print(...)
+  end
 end
 
 return M

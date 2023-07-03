@@ -4,7 +4,7 @@ local M = {}
 -- find the property with the pattern: var a = b;
 M.run = function(open_cmd)
   local property = vim.fn.expand("<cword>")
-  local pattern = ' ' .. property .. ' = '
+  local pattern = " " .. property .. " = "
 
   local search_property_definition_cmd = 'rg -U -t java --files-with-matches -n "' .. pattern .. '"'
   local files_matched = vim.fn.systemlist(search_property_definition_cmd)
