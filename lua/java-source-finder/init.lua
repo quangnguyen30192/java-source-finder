@@ -1,5 +1,5 @@
 local find_in_same_package = require("java-source-finder.finder_strategies.find_in_same_package").run
-local find_exact_match_path = require("java-source-finder.finder_strategies.find_exact_match_path").run
+local find_in_import_lines = require("java-source-finder.finder_strategies.find_in_import_lines").run
 local find_class_interface_in_path = require("java-source-finder.finder_strategies.find_class_interface_in_path").run
 local find_constant_definition = require("java-source-finder.finder_strategies.find_constant_definition").run
 local find_function_definition = require("java-source-finder.finder_strategies.find_function_definition").run

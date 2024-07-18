@@ -6,6 +6,21 @@ function file_exists(name)
   return f ~= nil and io.close(f)
 end
 
+function first_to_upper(str)
+    return (str:gsub("^%l", string.upper))
+end
+
+function M.is_symbol(str)
+    return str == first_to_upper(str)
+end
+
+local debug = function(...)
+  if vim.g.debug_enable then
+    vim.print(...)
+  end
+end
+
+
 function esc(x)
   return (
     x:gsub("%%", "%%%%")
@@ -80,15 +95,17 @@ end
 
 -- Jump to the file at exact line if the file is existed
 M.try_to_jump = function(open_cmd, paths, word)
-  -- vim.print(paths)
+  debug(paths)
   for _, path in ipairs(paths) do
     if file_exists(path) then
+      debug(path .. "OK")
       vim.cmd(open_cmd .. " " .. path)
       local found_line = find_definitions_in_file(word) or find_word_in_file(word)
       vim.cmd(tostring(found_line))
 
       return true
     end
+    debug(path .. " not ok ")
   end
 
   return false
@@ -284,10 +301,5 @@ M.convert_import_line_to_package_paths = function(import_line)
   return paths
 end
 
-M.debug = function(...)
-  if vim.g.debug_enable then
-    vim.print(...)
-  end
-end
 
 return M
