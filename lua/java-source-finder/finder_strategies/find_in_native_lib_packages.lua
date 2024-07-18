@@ -7,18 +7,12 @@ local function toJavaFile(package, symbol)
   return package .. "/" .. symbol .. ".java"
 end
 
--- 
-M.run = function(open_cmd)
-  local cur_word = vim.fn.expand("<cword>")
-  if not is_symbol(cur_word) then
-    return false
-  end
-
+M.run = function(open_cmd, symbol)
   local native_packages = {
-    toJavaFile(vim.g.libPath .. "/java.base/java/lang", cur_word),
+    toJavaFile(vim.g.java_source_finder_config.local_library .. "/java.base/java/lang", symbol),
   }
 
-  return try_to_jump(open_cmd, native_packages, cur_word)
+  return try_to_jump(open_cmd, native_packages, symbol)
 end
 
 return M

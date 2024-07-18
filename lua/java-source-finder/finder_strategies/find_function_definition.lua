@@ -1,5 +1,5 @@
 local find_import_line = require("java-source-finder.finder_strategies.helpers").find_import_line
-local jump_file_same_package = require("java-source-finder.finder_strategies.find_in_same_package").run
+local find_in_same_package = require("java-source-finder.finder_strategies.find_in_same_package").run
 local try_to_jump = require("java-source-finder.finder_strategies.helpers").try_to_jump
 local convert_import_line_to_file_path =
   require("java-source-finder.finder_strategies.helpers").convert_import_line_to_file_path
@@ -11,7 +11,7 @@ local M = {}
 local function find_by_import_line(open_cmd, class_name, method_name)
   local import_line = find_import_line(class_name)
   if import_line == nil then
-    return jump_file_same_package(open_cmd, class_name, method_name)
+    return find_in_same_package(open_cmd, class_name, method_name)
   end
 
   local file_paths = convert_import_line_to_file_path(import_line)

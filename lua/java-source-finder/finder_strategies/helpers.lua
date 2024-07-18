@@ -1,4 +1,8 @@
 local fzf = require("fzf")
+local src_paths = {
+  "/src/main/java",
+  "/src/test/java",
+}
 local M = {}
 
 function file_exists(name)
@@ -125,10 +129,11 @@ end
 M.build_paths = function(paths, file_path)
   local project_path = vim.fn.getcwd(0)
 
-  table.insert(paths, vim.g.libPath .. "/" .. file_path)
-  table.insert(paths, vim.g.libPath .. "/java.base/" .. file_path)
+  local lib_path = vim.g.java_source_finder_config.local_library
+  table.insert(paths, lib_path .. "/" .. file_path)
+  table.insert(paths, lib_path .. "/java.base/" .. file_path)
 
-  for _, src_path in ipairs(vim.g.srcPath) do
+  for _, src_path in ipairs(src_paths) do
     table.insert(paths, project_path .. src_path .. file_path)
   end
 end
@@ -183,7 +188,7 @@ M.fzf_pick_from_rg_response = function(open_cmd, response, class_name)
       local file = sp[1]
       -- file = string.gsub(file, esc(vim.fn.getcwd(0)), "")
       local sample_code = string.gsub(sp[3], "%s+ ", "")
-      for _, src_path in ipairs(vim.g.srcPath) do
+      for _, src_path in ipairs(src_paths) do
         -- file = string.gsub(file, esc(src_path), "")
         file = vim.fn.fnamemodify(file, ":p:t")
       end

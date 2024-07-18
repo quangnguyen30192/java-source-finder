@@ -3,10 +3,8 @@ local convert_import_line_to_folder_path = require('java-source-finder.finder_st
 
 local M = {}
 -- Find class or interface in the folder by name, ripgrep search, open the file and jump to correct line
-M.run = function(open_cmd)
-  local cur_word = vim.fn.expand("<cword>")
-
-  local import_line = find_import_line(cur_word)
+M.run = function(open_cmd, symbol)
+  local import_line = find_import_line(symbol)
   local paths
 
   if import_line == nil then
@@ -20,7 +18,7 @@ M.run = function(open_cmd)
       goto skip_to_next
     end
 
-    local results = vim.fn.systemlist('rg -n "(class|interface|enum) ' .. cur_word .. '" ' .. path)
+    local results = vim.fn.systemlist('rg -n "(class|interface|enum) ' .. symbol .. '" ' .. path)
     if vim.fn.empty(results) == 0 then
       for _, result in ipairs(results) do
         local split = vim.fn.split(result, ":")

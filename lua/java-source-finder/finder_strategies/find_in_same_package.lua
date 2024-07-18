@@ -1,9 +1,9 @@
 local try_to_jump = require("java-source-finder.finder_strategies.helpers").try_to_jump
 
 local M = {}
-M.run = function(open_cmd, filename, keyword)
+M.run = function(open_cmd, symbol, keyword)
   local cur_dir = vim.fn.expand("%:p:h")
-  local javaClassName = filename or vim.fn.expand("<cword>")
+  local javaClassName = symbol or vim.fn.expand("<cword>")
   local searchKeyword = keyword or javaClassName
 
   local paths = {}
