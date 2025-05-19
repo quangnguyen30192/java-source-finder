@@ -1,4 +1,4 @@
-local fzf = require("fzf")
+local fzf = require("fzf-lua")
 local src_paths = {
   "/src/main/java",
   "/src/test/java",

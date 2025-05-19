@@ -23,7 +23,10 @@ nnoremap gf :JavaFindSources<cr>
   "quangnguyen30192/java-source-finder.nvim"
   ft = "java",
   dependencies = {
-    'vijaymarupudi/nvim-fzf',
+    {
+      "ibhagwan/fzf-lua",
+      lazy = true
+    }
   }
   config = function()
     require("java-source-finder").setup({
